@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo en vivo — IDPHANTOM</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="description" content="Demo pública de IDPHANTOM: paga $0.01 USDC en Base mainnet con el estándar x402 y recibe un veredicto criptográfico al instante. Dinero real, sin registros.">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#05070D; --bg2:#0A0F1E; --ink:#EAF2FF; --muted:#8B9BB8;
+    --blue:#3D7BFF; --cyan:#45E3FF; --line:#16233D; --ok:#39D98A; --err:#FF6B6B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px}
+  a{color:var(--cyan);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{border-bottom:1px solid var(--line);padding:18px 0}
+  header .wrap{display:flex;justify-content:space-between;align-items:center}
+  .logo{font-weight:800;font-size:18px;letter-spacing:1px}
+  .logo span{color:var(--cyan)}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  .kicker{color:var(--cyan);font-size:12.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+  h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:10px 0 14px;line-height:1.15}
+  h2{font-size:20px;margin:26px 0 10px}
+  p.lead{color:var(--muted);max-width:640px;font-size:16px}
+  .step{border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:18px;background:linear-gradient(180deg,var(--bg2),var(--bg))}
+  .step h3{font-size:16px;display:flex;align-items:center;gap:10px}
+  .step h3 .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F;font-weight:800;align-items:center;justify-content:center;font-size:13px}
+  .step p{color:var(--muted);font-size:14px;margin-top:8px}
+  .btn{display:inline-block;margin-top:14px;padding:11px 22px;border-radius:10px;font-weight:700;color:#04121F;border:0;cursor:pointer;font-size:14.5px;
+    background:linear-gradient(90deg,var(--blue),var(--cyan));transition:.2s}
+  .btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 26px rgba(61,123,255,.35)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--line)}
+  pre{background:#070B16;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:12px;overflow-x:auto;color:#B9C8E8;margin-top:12px;white-space:pre-wrap;word-break:break-all}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:1px}
+  .tag.wait{background:rgba(61,123,255,.15);color:var(--blue)}
+  .tag.ok{background:rgba(57,217,138,.15);color:var(--ok)}
+  .tag.err{background:rgba(255,107,107,.15);color:var(--err)}
+  .good{border:1px solid rgba(57,217,138,.4);border-radius:14px;padding:22px;margin-top:18px;background:linear-gradient(180deg,rgba(57,217,138,.06),transparent)}
+  .good h3{color:var(--ok)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .pill{border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--muted)}
+  .pill b{color:var(--ink)}
+  footer{padding:32px 0 48px;color:#5C6B8A;font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="logo">ID<span>PHANTOM</span></div>
+  <a href="/">← Volver a la web</a>
+</div></header>
+
+<section style="border-top:0"><div class="wrap">
+  <div class="kicker">Demo en vivo · Base mainnet · dinero real</div>
+  <h1>Compra un veredicto por <span style="color:var(--cyan)">$0.01 USDC</span></h1>
+  <p class="lead">Así es como un agente (o un humano) paga por una API sin registros ni tarjetas: el servicio responde <code>402 Payment Required</code>, firmas una autorización EIP-3009 con tu wallet y recibes el resultado al instante. Aquí lo haces tú, paso a paso, con MetaMask.</p>
+
+  <div class="step" id="s1">
+    <h3><span class="n">1</span> Ver el reto 402 <span class="tag wait" id="t1">sin probar</span></h3>
+    <p>Llama al servicio sin pagar: te rechaza con el estándar x402 y te dice exactamente qué pago acepta (monto, moneda, red y destinatario).</p>
+    <button class="btn ghost" id="b1" onclick="step402()">Probar sin pagar</button>
+    <pre id="o1" style="display:none"></pre>
+  </div>
+
+  <div class="step" id="s2">
+    <h3><span class="n">2</span> Conectar MetaMask <span class="tag wait" id="t2">desconectado</span></h3>
+    <p>Necesitas Base mainnet y ~$0.01 USDC + unos céntimos de ETH para el gas de la liquidación. La firma del pago (paso 4) no gasta gas: solo la liquidación on-chain (paso 5).</p>
+    <button class="btn ghost" id="b2" onclick="connect()" disabled>Conectar wallet</button>
+    <pre id="o2" style="display:none"></pre>
+  </div>
+
+  <div class="step" id="s3">
+    <h3><span class="n">3</span> Firmar el recibo de demostración <span class="tag wait" id="t3">pendiente</span></h3>
+    <p>Un receipt IDPHANTOM es un <code>PaymentAuthorization</code> firmado con EIP-712 (dominio PhantomPay). Aquí firmas uno de juguete sobre tu propia wallet para verificarlo después.</p>
+    <button class="btn ghost" id="b3" onclick="signReceipt()" disabled>Firmar receipt (gratis)</button>
+    <pre id="o3" style="display:none"></pre>
+  </div>
+
+  <div class="step" id="s4">
+    <h3><span class="n">4</span> Pagar $0.01 (firma EIP-3009) <span class="tag wait" id="t4">pendiente</span></h3>
+    <p>Firmas una autorización <code>TransferWithAuthorization</code> de $0.01 USDC a la wallet del servicio. Es la firma de un cheque, no un envío: aún no se mueve nada.</p>
+    <button class="btn" id="b4" onclick="payAndVerify()" disabled>Pagar $0.01 y verificar</button>
+    <pre id="o4" style="display:none"></pre>
+  </div>
+
+  <div class="step" id="s5">
+    <h3><span class="n">5</span> Liquidar en cadena <span class="tag wait" id="t5">pendiente</span></h3>
+    <p>Aquí el dinero se mueve de verdad: tu wallet envía la autorización firmada al contrato USDC y el servicio cobra sus $0.01. Gas en Base: menos de un céntimo.</p>
+    <button class="btn" id="b5" onclick="settle()" disabled>Liquidar $0.01 on-chain</button>
+    <pre id="o5" style="display:none"></pre>
+  </div>
+
+  <div class="good" id="cert" style="display:none">
+    <h3>✅ Veredicto criptográfico entregado</h3>
+    <p style="color:var(--muted);font-size:14px;margin-top:6px">Esto es el «bien digital» que acabas de comprar: la comprobación firmada de que el receipt es válido. Un agente recibiría exactamente esto, automáticamente.</p>
+    <div class="row" id="certRows"></div>
+    <pre id="certJson"></pre>
+  </div>
+</div></section>
+
+<footer>
+  IDPHANTOM — DatalabiA · cobro x402 / EIP-3009 en Base mainnet ·
+  servicio: <a href="https://phantom-receipt-verify.onrender.com" target="_blank" rel="noopener">phantom-receipt-verify</a> ·
+  manifiesto: <a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">.well-known/x402</a>
+</footer>
+
+<script>
+const VERIFY_URL = "https://phantom-receipt-verify.onrender.com/verify";
+const CHAIN_ID = 8453;
+const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+const ROUTER = "0x873E94fd0b9B7684B9ccfa2463D83Bf9eA8A8755";
+const USDC_ABI = ["function transferWithAuthorization(address from, address to, uint256 value, uint256 validAfter, uint256 validBefore, bytes32 nonce, bytes signature)"];
+
+let challenge = null;   // reto 402 (accepts[0])
+let signer = null, user = null, provider = null;
+let receipt = null, receiptSig = null;
+let payment = null, paymentSig = null, verdict = null;
+
+const $ = id => document.getElementById(id);
+const show = (id, obj) => { const el = $(id); el.style.display = "block"; el.textContent = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2); };
+const tag = (id, txt, cls) => { const el = $(id); el.textContent = txt; el.className = "tag " + cls; };
+const randHex = n => "0x" + [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, "0")).join("");
+const b64 = s => btoa(unescape(encodeURIComponent(s)));
+
+async function step402() {
+  $("b1").disabled = true;
+  try {
+    const res = await fetch(VERIFY_URL, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    const body = await res.json();
+    show("o1", body);
+    if (res.status === 402 && body.accepts && body.accepts[0]) {
+      challenge = body.accepts[0];
+      tag("t1", "402 recibido", "ok");
+      $("b2").disabled = false;
+    } else { tag("t1", "respuesta inesperada", "err"); }
+  } catch (e) { show("o1", "Error: " + e.message); tag("t1", "error", "err"); }
+  $("b1").disabled = false;
+}
+
+async function connect() {
+  if (!window.ethereum) { show("o2", "MetaMask no detectado. Instálalo o usa un navegador con wallet."); return; }
+  $("b2").disabled = true;
+  try {
+    provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = await provider.getSigner();
+    user = await signer.getAddress();
+    try { await provider.send("wallet_switchEthereumChain", [{ chainId: "0x" + CHAIN_ID.toString(16) }]); }
+    catch (e) {
+      if (e.code === 4902) {
+        await provider.send("wallet_addChain", [{ chainId: "0x" + CHAIN_ID.toString(16), chainName: "Base", nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }, rpcUrls: ["https://mainnet.base.org"], blockExplorerUrls: ["https://basescan.org"] }]);
+      } else throw e;
+    }
+    show("o2", "Wallet: " + user + "\nRed: Base mainnet (8453)");
+    tag("t2", "conectado", "ok");
+    $("b3").disabled = false;
+  } catch (e) { show("o2", "Error: " + (e.message || e)); tag("t2", "error", "err"); }
+  $("b2").disabled = false;
+}
+
+async function signReceipt() {
+  $("b3").disabled = true;
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    receipt = {
+      paymentIntentId: randHex(32),
+      payer: user,
+      recipient: challenge.payTo,
+      token: USDC,
+      amount: "1000000",            // $1.00 de juguete
+      platformFee: "5000",          // fee 0.5%
+      maximumTotalAuthorized: "1005000",
+      nonce: BigInt(randHex(32)).toString(),
+      expiresAt: String(now + 3600),
+    };
+    receiptSig = await signer.signTypedData(
+      { name: "PhantomPay", version: "1", chainId: CHAIN_ID, verifyingContract: ROUTER },
+      { PaymentAuthorization: [
+        { name: "paymentIntentId", type: "bytes32" }, { name: "payer", type: "address" },
+        { name: "recipient", type: "address" }, { name: "token", type: "address" },
+        { name: "amount", type: "uint256" }, { name: "platformFee", type: "uint256" },
+        { name: "maximumTotalAuthorized", type: "uint256" }, { name: "nonce", type: "uint256" },
+        { name: "expiresAt", type: "uint64" },
+      ]},
+      receipt
+    );
+    show("o3", { receipt, signature: receiptSig });
+    tag("t3", "firmado", "ok");
+    $("b4").disabled = false;
+  } catch (e) { show("o3", "Error: " + (e.message || e)); tag("t3", "error", "err"); }
+  $("b3").disabled = false;
+}
+
+async function payAndVerify() {
+  $("b4").disabled = true;
+  try {
+    if (!challenge) throw new Error("primero ejecuta el paso 1 (reto 402)");
+    const now = Math.floor(Date.now() / 1000);
+    const auth = {
+      from: user,
+      to: challenge.payTo,
+      value: challenge.amount,
+      validAfter: String(now - 60),
+      validBefore: String(now + 900),
+      nonce: randHex(32),
+    };
+    payment = auth;
+    const domain = { name: challenge.extra?.name || "USD Coin", version: challenge.extra?.version || "2", chainId: CHAIN_ID, verifyingContract: challenge.asset };
+    paymentSig = await signer.signTypedData(
+      domain,
+      { TransferWithAuthorization: [
+        { name: "from", type: "address" }, { name: "to", type: "address" },
+        { name: "value", type: "uint256" }, { name: "validAfter", type: "uint256" },
+        { name: "validBefore", type: "uint256" }, { name: "nonce", type: "bytes32" },
+      ]},
+      auth
+    );
+    const xPayment = b64(JSON.stringify({
+      x402Version: 2, scheme: "exact", network: challenge.network,
+      payload: { signature: paymentSig, authorization: auth },
+    }));
+    const res = await fetch(VERIFY_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", "X-Payment": xPayment },
+      body: JSON.stringify({ ...receipt, signature: receiptSig }),
+    });
+    const body = await res.json();
+    show("o4", { httpStatus: res.status, body });
+    if (res.status === 200 && body.receipt) {
+      verdict = body;
+      tag("t4", "pagado · HTTP 200", "ok");
+      $("b5").disabled = false;
+      renderCert(body);
+    } else tag("t4", "HTTP " + res.status, "err");
+  } catch (e) { show("o4", "Error: " + (e.message || e)); tag("t4", "error", "err"); }
+  $("b4").disabled = false;
+}
+
+async function settle() {
+  $("b5").disabled = true;
+  try {
+    const usdc = new ethers.Contract(USDC, USDC_ABI, signer);
+    const tx = await usdc.transferWithAuthorization(
+      payment.from, payment.to, payment.value,
+      payment.validAfter, payment.validBefore, payment.nonce, paymentSig
+    );
+    show("o5", "Transacción enviada: " + tx.hash + "\nEsperando confirmación…");
+    const rcpt = await tx.wait();
+    tag("t5", "liquidado", "ok");
+    show("o5", {
+      txHash: tx.hash,
+      bloque: rcpt.blockNumber,
+      explorador: "https://basescan.org/tx/" + tx.hash,
+      nota: "Los $0.01 USDC ya están en la wallet del servicio. Liquidación real en Base mainnet.",
+    });
+    const a = document.createElement("a");
+    a.href = "https://basescan.org/tx/" + tx.hash; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = "Ver en Basescan →";
+    a.style.cssText = "display:inline-block;margin-top:12px;font-weight:700";
+    $("o5").after(a);
+  } catch (e) { show("o5", "Error: " + (e.message || e)); tag("t5", "error", "err"); }
+  $("b5").disabled = false;
+}
+
+function renderCert(body) {
+  $("cert").style.display = "block";
+  $("certRows").innerHTML = [
+    ["Firma EIP-712", body.receipt.checks.signatureValid ? "válida ✅" : "inválida ❌"],
+    ["Expiración", body.receipt.checks.notExpired ? "vigente ✅" : "vencida ❌"],
+    ["Estado on-chain", body.receipt.onChainState],
+    ["Pago", body.payment.settled === true ? "verificado por facilitator" : body.payment.settled],
+  ].map(([k, v]) => `<div class="pill">${k}: <b>${v}</b></div>`).join("");
+  $("certJson").textContent = JSON.stringify(body.receipt, null, 2);
+}
+</script>
+
+</body>
+</html>
