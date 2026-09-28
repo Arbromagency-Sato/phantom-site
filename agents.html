@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para agentes — IDPHANTOM</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="description" content="Receta máquina-a-máquina: cómo un agente autónomo paga $0.01 USDC por la API de verificación de receipts IDPHANTOM con el estándar x402. Sin humanos, sin ETH para gas: solo USDC.">
+<style>
+  :root{
+    --bg:#05070D; --bg2:#0A0F1E; --ink:#EAF2FF; --muted:#8B9BB8;
+    --blue:#3D7BFF; --cyan:#45E3FF; --line:#16233D; --ok:#39D98A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px}
+  a{color:var(--cyan);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{border-bottom:1px solid var(--line);padding:18px 0}
+  header .wrap{display:flex;justify-content:space-between;align-items:center}
+  .logo{font-weight:800;font-size:18px;letter-spacing:1px}
+  .logo span{color:var(--cyan)}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  .kicker{color:var(--cyan);font-size:12.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+  h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:10px 0 14px;line-height:1.15}
+  h2{font-size:20px;margin:30px 0 10px}
+  p.lead{color:var(--muted);max-width:660px;font-size:16px}
+  .step{border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:18px;background:linear-gradient(180deg,var(--bg2),var(--bg))}
+  .step h3{font-size:16px}
+  .step h3 .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F;font-weight:800;align-items:center;justify-content:center;font-size:13px;margin-right:10px}
+  .step p{color:var(--muted);font-size:14px;margin-top:8px}
+  pre{background:#070B16;border:1px solid var(--line);border-radius:10px;padding:16px;font-size:12.5px;overflow-x:auto;color:#B9C8E8;margin-top:12px;line-height:1.5}
+  code{font-family:Consolas,Menlo,monospace}
+  .note{border-left:3px solid var(--ok);padding:10px 16px;margin-top:18px;background:rgba(57,217,138,.05);color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:18px;background:linear-gradient(180deg,var(--bg2),var(--bg))}
+  .card b{display:block;font-size:14px;margin-bottom:6px}
+  .card p{color:var(--muted);font-size:13px}
+  footer{padding:32px 0 48px;color:#5C6B8A;font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="logo">ID<span>PHANTOM</span></div>
+  <a href="/">← Volver a la web</a>
+</div></header>
+
+<section style="border-top:0"><div class="wrap">
+  <div class="kicker">Máquina a máquina · x402 · Base mainnet</div>
+  <h1>Paga esta API con <span style="color:var(--cyan)">4 llamadas HTTP</span>. Sin humanos.</h1>
+  <p class="lead">Esta página es para agentes (y para los humanos que los programan). El servicio de verificación de receipts IDPHANTOM cobra <code>$0.01 USDC</code> por llamada con el estándar abierto <a href="https://x402.org" target="_blank" rel="noopener">x402</a>. Tu agente firma una autorización EIP-3009 y el facilitator (Coinbase CDP) liquida on-chain: <b>tu agente solo necesita USDC, ni siquiera ETH para el gas</b>.</p>
+
+  <div class="note">💡 Si tu agente usa un framework con soporte x402 (el SDK de Coinbase, agentes con wallet viem/ethers), la negociación 402→pago es automática. Esta receta es el protocolo crudo, para cualquier stack.</div>
+
+  <div class="step">
+    <h3><span class="n">1</span> Descubre el reto (llama sin pagar)</h3>
+    <p>El servicio responde <code>402</code> con el manifiesto de pago exacto: monto, moneda, red y destinatario.</p>
+    <pre>curl -s -X POST https://phantom-receipt-verify.onrender.com/verify \
+  -H "content-type: application/json" -d '{}'
+# → 402 { "accepts": [{ "scheme": "exact", "network": "eip155:8453",
+#      "amount": "10000", "asset": "0x833589…A02913"  /* USDC Base */,
+#      "payTo": "0xdBACb0…5C9f1", "extra": { "name": "USD Coin", "version": "2" } }] }</pre>
+  </div>
+
+  <div class="step">
+    <h3><span class="n">2</span> Firma la autorización de pago (EIP-3009)</h3>
+    <p>Tu agente firma <code>TransferWithAuthorization</code> con la clave de su wallet: monto exacto del reto, destinatario exacto, validez corta. Es una firma, no una transacción: no gasta gas ni mueve nada todavía.</p>
+    <pre>const auth = { from: agent.address, to: req.payTo, value: req.amount,
+  validAfter: now - 60, validBefore: now + 900, nonce: randomBytes32() };
+const signature = await agent.signTypedData(
+  { name: "USD Coin", version: "2", chainId: 8453, verifyingContract: req.asset },
+  { TransferWithAuthorization: [
+    { name: "from", type: "address" }, { name: "to", type: "address" },
+    { name: "value", type: "uint256" }, { name: "validAfter", type: "uint256" },
+    { name: "validBefore", type: "uint256" }, { name: "nonce", type: "bytes32" } ]},
+  auth);</pre>
+  </div>
+
+  <div class="step">
+    <h3><span class="n">3</span> Envía el pago en el header X-Payment</h3>
+    <p>El header es el JSON del pago en base64. Incluye el receipt a verificar en el cuerpo.</p>
+    <pre>const xPayment = btoa(JSON.stringify({
+  x402Version: 2, scheme: "exact", network: "eip155:8453",
+  payload: { signature, authorization: auth },
+}));
+const res = await fetch("https://phantom-receipt-verify.onrender.com/verify", {
+  method: "POST",
+  headers: { "content-type": "application/json", "X-Payment": xPayment },
+  body: JSON.stringify(receipt),  // PaymentAuthorization EIP-712 (dominio PhantomPay v1)
+});</pre>
+  </div>
+
+  <div class="step">
+    <h3><span class="n">4</span> Recibe veredicto + comprobante de liquidación</h3>
+    <p>El servicio valida la firma, consulta al facilitator (Coinbase CDP) y <b>liquida on-chain automáticamente</b>. La respuesta incluye el hash de la transacción real.</p>
+    <pre>// 200
+{ "payment": { "payer": "0xTuAgente…", "settled": true,
+               "transaction": "0x1840…5dce" },   // ← liquidación real en Base
+  "receipt": { "valid": true, "checks": { "signatureValid": true, … },
+               "onChainState": "free", "authHash": "0x…" } }</pre>
+  </div>
+
+  <h2>Puntos de entrada para tu agente</h2>
+  <div class="grid">
+    <div class="card"><b>Manifiesto x402 (descubrimiento)</b><p><a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">/.well-known/x402</a> — formato estándar para agentes x402.</p></div>
+    <div class="card"><b>OpenAPI</b><p><a href="https://phantom-receipt-verify.onrender.com/openapi.json" target="_blank" rel="noopener">/openapi.json</a> — esquema completo del endpoint /verify.</p></div>
+    <div class="card"><b>Conector MCP</b><p><a href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">idphantom-mcp-server</a> — para Claude, Cursor y agentes MCP.</p></div>
+    <div class="card"><b>Red y moneda</b><p>Base mainnet (eip155:8453), USDC nativo 0x833589…A02913. Tu agente solo necesita saldo USDC: el gas del settlement lo paga el facilitator.</p></div>
+  </div>
+</div></section>
+
+<footer>
+  IDPHANTOM — DatalabiA · pagos agente-a-agente estándar x402 ·
+  demo para humanos: <a href="/demo.html">idphantom.com/demo.html</a>
+</footer>
+
+</body>
+</html>
