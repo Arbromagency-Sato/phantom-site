@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IDPHANTOM — AI Payments Infrastructure</title>
 <link rel="icon" type="image/png" href="/favicon.png">
-<meta name="description" content="IDPHANTOM: infraestructura de pagos agente-a-agente. El kit para que cualquier negocio cobre a agentes autónomos en USDC y gane el 0.5% de cada venta.">
+<meta name="description" content="IDPHANTOM: agent-to-agent payment infrastructure. Any business charges autonomous agents in USDC — and earns 0.5% of every sale, automatically, with no custody.">
 <style>
   :root{
     --bg:#05070D; --bg2:#0A0F1E; --ink:#EAF2FF; --muted:#8B9BB8;
@@ -16,9 +16,25 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
   a{color:var(--cyan);text-decoration:none}
   a:hover{text-decoration:underline}
+  code{background:#0D1526;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:12.5px;color:var(--cyan)}
+
+  /* TOPBAR */
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 24px;background:rgba(5,7,13,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand img{height:30px;width:30px;object-fit:contain}
+  .brand b{font-size:17px;letter-spacing:1.5px;font-weight:800}
+  .brand b span{color:var(--cyan)}
+  .topnav{display:flex;align-items:center;gap:18px}
+  .topnav a{color:var(--muted);font-size:13.5px;font-weight:600}
+  .topnav a:hover{color:var(--cyan);text-decoration:none}
+  .lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .lang button{background:transparent;border:0;color:var(--muted);font-size:12px;font-weight:700;
+    padding:6px 11px;cursor:pointer;font-family:inherit}
+  .lang button.on{background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F}
 
   /* HERO */
-  .hero{position:relative;min-height:88vh;display:flex;align-items:flex-end;overflow:hidden;
+  .hero{position:relative;min-height:82vh;display:flex;align-items:flex-end;overflow:hidden;
     background:url("hero.jpg") center/cover no-repeat}
   .hero::after{content:"";position:absolute;inset:0;
     background:linear-gradient(180deg,rgba(5,7,13,.15) 0%,rgba(5,7,13,.55) 55%,rgba(5,7,13,.97) 100%)}
@@ -42,68 +58,103 @@
   .card h3{font-size:19px;margin:8px 0 10px}
   .card p{color:var(--muted);font-size:14.5px}
 
+  /* ROAD */
+  .road{border:1px solid var(--line);border-radius:14px;padding:26px;margin-top:26px;background:var(--bg2)}
+  .road .lane{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+  .toll{color:#FFB43A;font-weight:700;display:flex;align-items:center;gap:8px}
+  .mint{color:var(--cyan);font-weight:700;display:flex;align-items:center;gap:8px}
+  .arrow{color:var(--muted)}
+  .chipicon{width:18px;height:18px;flex:none}
+
+  /* STATS */
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:26px}
   .stat{border-left:2px solid var(--blue);padding:6px 0 6px 16px}
   .stat b{display:block;font-size:clamp(26px,3.4vw,38px);font-weight:800}
   .stat span{color:var(--muted);font-size:12.5px}
   .src{margin-top:18px;color:#5C6B8A;font-size:11.5px}
 
-  .road{border:1px solid var(--line);border-radius:14px;padding:26px;margin-top:26px;background:var(--bg2)}
-  .road .lane{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
-  .toll{color:#FFB43A;font-weight:700}
-  .mint{color:var(--cyan);font-weight:700}
-  .arrow{color:var(--muted)}
+  /* A2A LIVE */
+  .a2a{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:28px}
+  .actor{border:1px solid var(--line);border-radius:14px;padding:20px;background:linear-gradient(180deg,var(--bg2),var(--bg));text-align:center}
+  .actor svg{width:34px;height:34px;margin-bottom:10px}
+  .actor .role{font-size:11.5px;font-weight:700;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
+  .actor .who{font-size:15px;font-weight:700;margin-top:4px}
+  .actor .addr{font-family:Consolas,monospace;font-size:11.5px;color:var(--muted);margin-top:4px;word-break:break-all}
+  .flows{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .flow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--bg2);font-size:13.5px}
+  .flow b{color:var(--cyan)}
+  .flow .amt{margin-left:auto;font-family:Consolas,monospace;font-weight:700}
+  .txproof{margin-top:16px;border:1px solid rgba(57,217,138,.35);border-radius:12px;padding:16px 20px;
+    background:rgba(57,217,138,.05);font-size:13.5px;color:var(--muted)}
+  .txproof b{color:var(--ink)}
 
   .live{display:flex;flex-wrap:wrap;gap:14px;margin-top:24px}
   .live a.btn{border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--ink);background:var(--bg2)}
   .live a.btn:hover{border-color:var(--cyan);text-decoration:none}
-  code{background:#0D1526;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:12.5px;color:var(--cyan)}
 
   footer{padding:40px 0 56px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
   footer b{color:var(--ink)}
+  @media(max-width:640px){.topnav a.hidem{display:none}}
 </style>
 </head>
 <body>
 
+<div class="topbar">
+  <div class="brand">
+    <img src="/logo.png" alt="IDPHANTOM">
+    <b>ID<span>PHANTOM</span></b>
+  </div>
+  <div class="topnav">
+    <a href="/agents.html" class="hidem" data-es="Para agentes" data-en="For agents">Para agentes</a>
+    <a href="/demo.html" class="hidem" data-es="Demo $0.01" data-en="$0.01 demo">Demo $0.01</a>
+    <div class="lang">
+      <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+
 <header class="hero">
   <div class="wrap hero-inner">
-    <h1>Coinbase construyó la carretera.<br><span>IDPHANTOM vende los puestos.</span></h1>
-    <p class="sub">Infraestructura de pagos agente-a-agente: cualquier negocio cobra a agentes autónomos en USDC — y gana el <strong>0.5%</strong> de cada venta, automáticamente, sin custodia.</p>
+    <h1 data-es-html="Coinbase construyó la carretera.<br><span>Nosotros vendemos los puestos.</span>" data-en-html="Coinbase built the highway.<br><span>We sell the roadside stands.</span>">Coinbase construyó la carretera.<br><span>Nosotros vendemos los puestos.</span></h1>
+    <p class="sub" data-es="Infraestructura de pagos agente-a-agente: cualquier negocio cobra a agentes autónomos en USDC — y gana el 0.5% de cada venta, automáticamente, sin custodia." data-en="Agent-to-agent payment infrastructure: any business charges autonomous agents in USDC — and earns 0.5% of every sale, automatically, with no custody.">Infraestructura de pagos agente-a-agente: cualquier negocio cobra a agentes autónomos en USDC — y gana el 0.5% de cada venta, automáticamente, sin custodia.</p>
     <div class="badges">
-      <span class="badge">Agent to agent</span><span class="badge">Instant</span>
-      <span class="badge">Secure by design</span><span class="badge">Borderless</span>
-      <span class="badge">No humans · no limits</span>
+      <span class="badge" data-es="Agente a agente" data-en="Agent to agent">Agente a agente</span>
+      <span class="badge" data-es="Instantáneo" data-en="Instant">Instantáneo</span>
+      <span class="badge" data-es="Seguro por diseño" data-en="Secure by design">Seguro por diseño</span>
+      <span class="badge" data-es="Sin fronteras" data-en="Borderless">Sin fronteras</span>
+      <span class="badge" data-es="Sin humanos · sin límites" data-en="No humans · no limits">Sin humanos · sin límites</span>
     </div>
-    <a class="cta" href="#servicio">Ver el servicio en vivo</a>
+    <a class="cta" href="#a2a" data-es="Ver la prueba en vivo" data-en="See the live proof">Ver la prueba en vivo</a>
   </div>
 </header>
 
 <section id="kit">
   <div class="wrap">
-    <div class="kicker">Qué lleva el kit — tres piezas</div>
-    <h2>El modelo que los gigantes no pueden copiar</h2>
+    <div class="kicker" data-es="Qué lleva el kit — tres piezas" data-en="What's in the kit — three pieces">Qué lleva el kit — tres piezas</div>
+    <h2 data-es="El modelo que los gigantes no pueden copiar" data-en="The model giants can't copy">El modelo que los gigantes no pueden copiar</h2>
     <div class="grid3">
       <div class="card">
         <div class="num">01</div>
-        <h3>La comisión invertida</h3>
-        <p>En x402 el cajero cobra al comerciante. Con PhantomRouter, el comerciante se queda el 0.5% de cada pago: cobra a agentes y gana comisión sin infraestructura. Nadie más ofrece take-rate al vendedor.</p>
+        <h3 data-es="La comisión invertida" data-en="The inverted commission">La comisión invertida</h3>
+        <p data-es="En x402 el cajero cobra al comerciante. Con PhantomRouter, el comerciante se queda el 0.5% de cada pago: cobra a agentes y gana comisión sin infraestructura. Nadie más ofrece take-rate al vendedor." data-en="In x402 the toll charges the merchant. With PhantomRouter, the merchant keeps 0.5% of every payment: charge agents and earn commission with zero infrastructure. No one else pays the seller a take-rate.">En x402 el cajero cobra al comerciante. Con PhantomRouter, el comerciante se queda el 0.5% de cada pago: cobra a agentes y gana comisión sin infraestructura. Nadie más ofrece take-rate al vendedor.</p>
       </div>
       <div class="card">
         <div class="num">02</div>
-        <h3>El recibo de verdad</h3>
-        <p>x402 mueve el dinero; no prueba qué se compró. Nuestro receipt — firma EIP-712 más estado on-chain (libre / usado / cancelado) — acredita el pago entre agentes que nunca se han visto.</p>
+        <h3 data-es="El recibo de verdad" data-en="The receipt of truth">El recibo de verdad</h3>
+        <p data-es="x402 mueve el dinero; no prueba qué se compró. Nuestro receipt — firma EIP-712 más estado on-chain (libre / usado / cancelado) — acredita el pago entre agentes que nunca se han visto." data-en="x402 moves the money; it doesn't prove what was bought. Our receipt — EIP-712 signature plus on-chain state (free / used / cancelled) — certifies payment between agents that have never met.">x402 mueve el dinero; no prueba qué se compró. Nuestro receipt — firma EIP-712 más estado on-chain (libre / usado / cancelado) — acredita el pago entre agentes que nunca se han visto.</p>
       </div>
       <div class="card">
         <div class="num">03</div>
-        <h3>La alcancía con límite</h3>
-        <p>Tope de gasto dentro del propio pago, comisión con techo del 2.5%, cambios con timelock y cancelación firmada. La seguridad que Google propone como capa aparte, incluida en el contrato.</p>
+        <h3 data-es="La alcancía con límite" data-en="The capped piggy bank">La alcancía con límite</h3>
+        <p data-es="Tope de gasto dentro del propio pago, comisión con techo del 2.5%, cambios con timelock y cancelación firmada. La seguridad que Google propone como capa aparte, incluida en el contrato." data-en="Spending caps inside the payment itself, commission capped at 2.5%, timelocked changes and signed cancellation. The security Google proposes as a separate layer, built into the contract.">Tope de gasto dentro del propio pago, comisión con techo del 2.5%, cambios con timelock y cancelación firmada. La seguridad que Google propone como capa aparte, incluida en el contrato.</p>
       </div>
     </div>
     <div class="road">
       <div class="lane">
-        <span class="toll">⛔ PEAJE — x402/Coinbase: cobra al comerciante</span>
-        <span class="arrow">— 🛣️ robots agentes —▶</span>
-        <span class="mint">🏪 FRANQUICIA — IDPHANTOM: el comerciante gana el 0.5%</span>
+        <span class="toll"><svg class="chipicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg><span data-es="PEAJE — x402/Coinbase: cobra al comerciante" data-en="TOLL — x402/Coinbase: charges the merchant">PEAJE — x402/Coinbase: cobra al comerciante</span></span>
+        <span class="arrow" data-es="— agentes autónomos —▶" data-en="— autonomous agents —▶">— agentes autónomos —▶</span>
+        <span class="mint"><svg class="chipicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16l-1.5 12h-13L4 7zM8 7a4 4 0 018 0"/></svg><span data-es="PUESTO — IDPHANTOM: el comerciante gana el 0.5%" data-en="STAND — IDPHANTOM: the merchant earns 0.5%">PUESTO — IDPHANTOM: el comerciante gana el 0.5%</span></span>
       </div>
     </div>
   </div>
@@ -111,48 +162,115 @@
 
 <section id="mercado">
   <div class="wrap">
-    <div class="kicker">El mercado hoy</div>
-    <h2>Los agentes ya pagan solos</h2>
+    <div class="kicker" data-es="El mercado hoy" data-en="The market today">El mercado hoy</div>
+    <h2 data-es="Los agentes ya pagan solos" data-en="Agents already pay on their own">Los agentes ya pagan solos</h2>
     <div class="stats">
-      <div class="stat"><b>$73M</b><span>liquidados por agentes de IA en 12 meses</span></div>
-      <div class="stat"><b>176M</b><span>transacciones máquina-a-máquina on-chain</span></div>
-      <div class="stat"><b>98.6%</b><span>de esos pagos se liquidan en USDC</span></div>
-      <div class="stat"><b>&lt;5%</b><span>de los 11,000 servidores MCP están monetizados</span></div>
+      <div class="stat"><b>$73M</b><span data-es="liquidados por agentes de IA en 12 meses" data-en="settled by AI agents in 12 months">liquidados por agentes de IA en 12 meses</span></div>
+      <div class="stat"><b>176M</b><span data-es="transacciones máquina-a-máquina on-chain" data-en="machine-to-machine transactions on-chain">transacciones máquina-a-máquina on-chain</span></div>
+      <div class="stat"><b>98.6%</b><span data-es="de esos pagos se liquidan en USDC" data-en="of those payments settle in USDC">de esos pagos se liquidan en USDC</span></div>
+      <div class="stat"><b>&lt;5%</b><span data-es="de los 11.000 servidores MCP están monetizados" data-en="of 11,000 MCP servers are monetized">de los 11.000 servidores MCP están monetizados</span></div>
     </div>
-    <p class="src">Fuentes: Keyrock «Who Pays the Agent?» (may 2026) · Coinbase x402 (abr 2026) · ChainCatcher (may 2026).</p>
+    <p class="src">Fuentes / Sources: Keyrock «Who Pays the Agent?» (may 2026) · Coinbase x402 (abr 2026) · ChainCatcher (may 2026).</p>
+  </div>
+</section>
+
+<section id="a2a">
+  <div class="wrap">
+    <div class="kicker" data-es="Prueba verificable · Base mainnet · dinero real" data-en="Verifiable proof · Base mainnet · real money">Prueba verificable · Base mainnet · dinero real</div>
+    <h2 data-es="Un agente pagó a otro. El contrato nos pagó a nosotros." data-en="One agent paid another. The contract paid us.">Un agente pagó a otro. El contrato nos pagó a nosotros.</h2>
+    <p style="color:var(--muted);max-width:680px" data-es="Este pago se ejecutó de verdad el 28 de septiembre de 2026. Sin personas, sin tarjetas, sin permisos: el Agente A firmó, el contrato PhantomRouter repartió el dinero en una sola transacción, y cada céntimo quedó escrito en la blockchain." data-en="This payment actually executed on September 28, 2026. No people, no cards, no permissions: Agent A signed, the PhantomRouter contract split the money in a single transaction, and every cent is written on the blockchain.">Este pago se ejecutó de verdad el 28 de septiembre de 2026. Sin personas, sin tarjetas, sin permisos: el Agente A firmó, el contrato PhantomRouter repartió el dinero en una sola transacción, y cada céntimo quedó escrito en la blockchain.</p>
+
+    <div class="a2a">
+      <div class="actor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3D7BFF" stroke-width="1.6"><rect x="5" y="7" width="14" height="11" rx="2"/><path d="M12 7V4M9 4h6"/><circle cx="10" cy="12.5" r="1" fill="#3D7BFF"/><circle cx="14" cy="12.5" r="1" fill="#3D7BFF"/><path d="M9.5 15.5h5"/></svg>
+        <div class="role" data-es="Agente A · pagador" data-en="Agent A · payer">Agente A · pagador</div>
+        <div class="addr">0x477917eB…bCb0497F</div>
+      </div>
+      <div class="actor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#45E3FF" stroke-width="1.6"><rect x="5" y="7" width="14" height="11" rx="2"/><path d="M12 7V4M9 4h6"/><circle cx="10" cy="12.5" r="1" fill="#45E3FF"/><circle cx="14" cy="12.5" r="1" fill="#45E3FF"/><path d="M9.5 15.5h5"/></svg>
+        <div class="role" data-es="Agente B · vendedor" data-en="Agent B · seller">Agente B · vendedor</div>
+        <div class="addr">0xdBACb05D…4B5C9f1</div>
+      </div>
+      <div class="actor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#39D98A" stroke-width="1.6"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div class="role" data-es="Tesorería IDPHANTOM" data-en="IDPHANTOM treasury">Tesorería IDPHANTOM</div>
+        <div class="addr">0xD45fD177…F22953c</div>
+      </div>
+    </div>
+
+    <div class="flows">
+      <div class="flow"><span data-es="Pago por el servicio" data-en="Payment for the service">Pago por el servicio</span><span class="amt">$2.00 USDC → B</span></div>
+      <div class="flow"><span data-es="Comisión 0.5% (cortada por el contrato)" data-en="0.5% fee (split by the contract)">Comisión 0.5% (cortada por el contrato)</span><span class="amt">$0.01 USDC → IDPHANTOM</span></div>
+    </div>
+
+    <div class="txproof">
+      <span data-es="Transacción" data-en="Transaction">Transacción</span>: <b>0x4db6eb4d…c0881554</b> ·
+      <span data-es="bloque" data-en="block">bloque</span> <b>51922519</b> ·
+      <a href="https://basescan.org/tx/0x4db6eb4dd80c7e4eb3a8c7a46f48dc7958c48dbb4c795c3790d7f94bc0881554" target="_blank" rel="noopener" data-es="Ver en Basescan →" data-en="View on Basescan →">Ver en Basescan →</a>
+      <div style="margin-top:8px" data-es="Una sola transacción, tres wallets: el dinero se movió solo. Esto es lo que tu negocio haría cada vez que un agente le pague a otro a través de ti." data-en="A single transaction, three wallets: the money moved by itself. This is what your business would do every time an agent pays another through you.">Una sola transacción, tres wallets: el dinero se movió solo. Esto es lo que tu negocio haría cada vez que un agente le pague a otro a través de ti.</div>
+    </div>
+
+    <div class="live">
+      <a class="btn" href="/agents.html" data-es="Cobrar como Agente B →" data-en="Charge like Agent B →">Cobrar como Agente B →</a>
+      <a class="btn" href="/demo.html" data-es="Probar el pago de $0.01 →" data-en="Try the $0.01 payment →">Probar el pago de $0.01 →</a>
+    </div>
   </div>
 </section>
 
 <section id="servicio">
   <div class="wrap">
-    <div class="kicker">Servicio en vivo</div>
-    <h2>Verificación de recibos de pago</h2>
-    <p style="color:var(--muted);max-width:680px">API de consulta disponible 24/7. Cada verificación cuesta <code>$0.01 USDC</code> y se cobra automáticamente en el momento de la consulta.</p>
+    <div class="kicker" data-es="Servicio en vivo" data-en="Live service">Servicio en vivo</div>
+    <h2 data-es="Verificación de recibos de pago" data-en="Payment receipt verification">Verificación de recibos de pago</h2>
+    <p style="color:var(--muted);max-width:680px" data-es-html="API de consulta disponible 24/7. Cada verificación cuesta <code>$0.01 USDC</code> y se cobra automáticamente en el momento de la consulta — cualquier agente puede pagarla sin registrarse." data-en-html="Query API available 24/7. Each verification costs <code>$0.01 USDC</code> and is charged automatically at query time — any agent can pay it with no signup.">API de consulta disponible 24/7. Cada verificación cuesta <code>$0.01 USDC</code> y se cobra automáticamente en el momento de la consulta — cualquier agente puede pagarla sin registrarse.</p>
     <div class="live">
-      <a class="btn" href="/agents.html">Para agentes: 4 llamadas →</a>
-      <a class="btn" href="/demo.html">Demo en vivo: paga $0.01 →</a>
-      <a class="btn" href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">Conector MCP →</a>
+      <a class="btn" href="/agents.html" data-es="Para agentes: 4 llamadas →" data-en="For agents: 4 calls →">Para agentes: 4 llamadas →</a>
+      <a class="btn" href="/demo.html" data-es="Demo en vivo →" data-en="Live demo →">Demo en vivo →</a>
+      <a class="btn" href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">MCP / Smithery →</a>
     </div>
   </div>
 </section>
 
 <section id="ip">
   <div class="wrap">
-    <div class="kicker">Propiedad intelectual</div>
-    <h2>La idea, fijada en público</h2>
-    <p style="color:var(--muted);max-width:680px">La combinación — comisión programable para el vendedor + receipts verificables + topes de gasto dentro del pago — está publicada como arte previo (CC0) con fecha de 2026-09-27. El código y la operación permanecen privados.</p>
+    <div class="kicker" data-es="Propiedad intelectual" data-en="Intellectual property">Propiedad intelectual</div>
+    <h2 data-es="La idea, fijada en público" data-en="The idea, fixed in public">La idea, fijada en público</h2>
+    <p style="color:var(--muted);max-width:680px" data-es="La combinación — comisión programable para el vendedor + receipts verificables + topes de gasto dentro del pago — está publicada como arte previo (CC0) con fecha de 2026-09-27. El código y la operación permanecen privados." data-en="The combination — programmable commission for the seller + verifiable receipts + spending caps inside the payment — is published as prior art (CC0) dated 2026-09-27. Code and operations remain private.">La combinación — comisión programable para el vendedor + receipts verificables + topes de gasto dentro del pago — está publicada como arte previo (CC0) con fecha de 2026-09-27. El código y la operación permanecen privados.</p>
     <div class="live">
-      <a class="btn" href="https://gist.github.com/Arbromagency-Sato/c43a998245523034c7e2e009a07584ba" target="_blank" rel="noopener">Publicación defensiva (Gist) →</a>
+      <a class="btn" href="https://gist.github.com/Arbromagency-Sato/c43a998245523034c7e2e009a07584ba" target="_blank" rel="noopener" data-es="Publicación defensiva (Gist) →" data-en="Defensive publication (Gist) →">Publicación defensiva (Gist) →</a>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <p><b>Ellos venden el peaje. Nosotros vendemos la franquicia.</b></p>
-    <p style="margin-top:10px">IDPHANTOM — DatalabiA · Infraestructura de pagos agente-a-agente · 2026</p>
+    <p><b data-es="Ellos cobran el peaje. Nosotros vendemos el puesto." data-en="They charge the toll. We sell the stand.">Ellos cobran el peaje. Nosotros vendemos el puesto.</b></p>
+    <p style="margin-top:10px">IDPHANTOM — DatalabiA · <span data-es="Infraestructura de pagos agente-a-agente" data-en="Agent-to-agent payment infrastructure">Infraestructura de pagos agente-a-agente</span> · 2026</p>
   </div>
 </footer>
+
+<script>
+(function(){
+  function applyLang(l){
+    document.querySelectorAll('[data-es]').forEach(function(el){
+      var v = el.getAttribute('data-' + l); if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-es-html]').forEach(function(el){
+      var v = el.getAttribute('data-' + l + '-html'); if (v != null) el.innerHTML = v;
+    });
+    document.documentElement.lang = l;
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('on', b.dataset.lang === l);
+    });
+    try{ localStorage.setItem('idph-lang', l); }catch(e){}
+  }
+  var saved = null; try{ saved = localStorage.getItem('idph-lang'); }catch(e){}
+  var lang = saved || ((navigator.language||'es').toLowerCase().indexOf('es') === 0 ? 'es' : 'en');
+  window.setLang = applyLang;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ applyLang(lang); });
+  } else { applyLang(lang); }
+})();
+</script>
 
 </body>
 </html>

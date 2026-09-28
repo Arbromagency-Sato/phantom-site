@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para agentes — IDPHANTOM</title>
+<title data-es-title="Para agentes — IDPHANTOM" data-en-title="For agents — IDPHANTOM">Para agentes — IDPHANTOM</title>
 <link rel="icon" type="image/png" href="/favicon.png">
-<meta name="description" content="Receta máquina-a-máquina: cómo un agente autónomo paga $0.01 USDC por la API de verificación de receipts IDPHANTOM con el estándar x402. Sin humanos, sin ETH para gas: solo USDC.">
+<meta name="description" content="Machine-to-machine recipe: how an autonomous agent pays $0.01 USDC for the IDPHANTOM receipt-verification API with the x402 standard. No humans, no ETH for gas: just USDC.">
 <style>
   :root{
     --bg:#05070D; --bg2:#0A0F1E; --ink:#EAF2FF; --muted:#8B9BB8;
@@ -16,10 +16,24 @@
   .wrap{max-width:880px;margin:0 auto;padding:0 24px}
   a{color:var(--cyan);text-decoration:none}
   a:hover{text-decoration:underline}
-  header{border-bottom:1px solid var(--line);padding:18px 0}
-  header .wrap{display:flex;justify-content:space-between;align-items:center}
-  .logo{font-weight:800;font-size:18px;letter-spacing:1px}
-  .logo span{color:var(--cyan)}
+  code{background:#0D1526;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:12.5px;color:var(--cyan)}
+
+  /* TOPBAR (misma identidad que index) */
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 24px;background:rgba(5,7,13,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand a{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .brand img{height:30px;width:30px;object-fit:contain}
+  .brand b{font-size:17px;letter-spacing:1.5px;font-weight:800}
+  .brand b span{color:var(--cyan)}
+  .topnav{display:flex;align-items:center;gap:18px}
+  .topnav a{color:var(--muted);font-size:13.5px;font-weight:600}
+  .topnav a:hover{color:var(--cyan);text-decoration:none}
+  .lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .lang button{background:transparent;border:0;color:var(--muted);font-size:12px;font-weight:700;
+    padding:6px 11px;cursor:pointer;font-family:inherit}
+  .lang button.on{background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F}
+
   section{padding:56px 0;border-top:1px solid var(--line)}
   .kicker{color:var(--cyan);font-size:12.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
   h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:10px 0 14px;line-height:1.15}
@@ -30,32 +44,50 @@
   .step h3 .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F;font-weight:800;align-items:center;justify-content:center;font-size:13px;margin-right:10px}
   .step p{color:var(--muted);font-size:14px;margin-top:8px}
   pre{background:#070B16;border:1px solid var(--line);border-radius:10px;padding:16px;font-size:12.5px;overflow-x:auto;color:#B9C8E8;margin-top:12px;line-height:1.5}
-  code{font-family:Consolas,Menlo,monospace}
-  .note{border-left:3px solid var(--ok);padding:10px 16px;margin-top:18px;background:rgba(57,217,138,.05);color:var(--muted);font-size:14px}
+  pre code{background:transparent;border:0;padding:0;color:inherit}
+  .note{border-left:3px solid var(--ok);padding:12px 16px;margin-top:18px;background:rgba(57,217,138,.05);color:var(--muted);font-size:14px;display:flex;gap:12px;align-items:flex-start}
+  .note svg{width:18px;height:18px;flex:none;margin-top:2px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}
   .card{border:1px solid var(--line);border-radius:12px;padding:18px;background:linear-gradient(180deg,var(--bg2),var(--bg))}
   .card b{display:block;font-size:14px;margin-bottom:6px}
   .card p{color:var(--muted);font-size:13px}
+  .mcp-block{margin-top:14px}
+  .mcp-block .mcp-label{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
   footer{padding:32px 0 48px;color:#5C6B8A;font-size:12.5px;text-align:center}
 </style>
 </head>
 <body>
 
-<header><div class="wrap">
-  <div class="logo">ID<span>PHANTOM</span></div>
-  <a href="/">← Volver a la web</a>
-</div></header>
+<div class="topbar">
+  <div class="brand">
+    <a href="/">
+      <img src="/logo.png" alt="IDPHANTOM">
+      <b>ID<span>PHANTOM</span></b>
+    </a>
+  </div>
+  <div class="topnav">
+    <a href="/demo.html" data-es="Demo $0.01" data-en="$0.01 demo">Demo $0.01</a>
+    <a href="/" data-es="← Volver a la web" data-en="← Back to site">← Volver a la web</a>
+    <div class="lang">
+      <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
 
 <section style="border-top:0"><div class="wrap">
-  <div class="kicker">Máquina a máquina · x402 · Base mainnet</div>
-  <h1>Paga esta API con <span style="color:var(--cyan)">4 llamadas HTTP</span>. Sin humanos.</h1>
-  <p class="lead">Esta página es para agentes (y para los humanos que los programan). El servicio de verificación de receipts IDPHANTOM cobra <code>$0.01 USDC</code> por llamada con el estándar abierto <a href="https://x402.org" target="_blank" rel="noopener">x402</a>. Tu agente firma una autorización EIP-3009 y el facilitator (Coinbase CDP) liquida on-chain: <b>tu agente solo necesita USDC, ni siquiera ETH para el gas</b>.</p>
+  <div class="kicker" data-es="Máquina a máquina · x402 · Base mainnet" data-en="Machine to machine · x402 · Base mainnet">Máquina a máquina · x402 · Base mainnet</div>
+  <h1 data-es-html="Paga esta API con <span style=&quot;color:var(--cyan)&quot;>4 llamadas HTTP</span>. Sin humanos." data-en-html="Pay for this API with <span style=&quot;color:var(--cyan)&quot;>4 HTTP calls</span>. No humans.">Paga esta API con <span style="color:var(--cyan)">4 llamadas HTTP</span>. Sin humanos.</h1>
+  <p class="lead" data-es-html="Esta página es para agentes (y para los humanos que los programan). El servicio de verificación de receipts IDPHANTOM cobra <code>$0.01 USDC</code> por llamada con el estándar abierto <a href=&quot;https://x402.org&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;>x402</a>. Tu agente firma una autorización EIP-3009 y el facilitator (Coinbase CDP) liquida on-chain: <b>tu agente solo necesita USDC, ni siquiera ETH para el gas</b>." data-en-html="This page is for agents (and for the humans who program them). The IDPHANTOM receipt-verification service charges <code>$0.01 USDC</code> per call using the open <a href=&quot;https://x402.org&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;>x402</a> standard. Your agent signs an EIP-3009 authorization and the facilitator (Coinbase CDP) settles on-chain: <b>your agent only needs USDC — not even ETH for gas</b>.">Esta página es para agentes (y para los humanos que los programan). El servicio de verificación de receipts IDPHANTOM cobra <code>$0.01 USDC</code> por llamada con el estándar abierto <a href="https://x402.org" target="_blank" rel="noopener">x402</a>. Tu agente firma una autorización EIP-3009 y el facilitator (Coinbase CDP) liquida on-chain: <b>tu agente solo necesita USDC, ni siquiera ETH para el gas</b>.</p>
 
-  <div class="note">💡 Si tu agente usa un framework con soporte x402 (el SDK de Coinbase, agentes con wallet viem/ethers), la negociación 402→pago es automática. Esta receta es el protocolo crudo, para cualquier stack.</div>
+  <div class="note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#39D98A" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0012 3z"/></svg>
+    <span data-es="Si tu agente usa un framework con soporte x402 (el SDK de Coinbase, agentes con wallet viem/ethers), la negociación 402→pago es automática. Esta receta es el protocolo crudo, para cualquier stack." data-en="If your agent uses an x402-enabled framework (the Coinbase SDK, viem/ethers wallet agents), the 402→payment negotiation is automatic. This recipe is the raw protocol, for any stack.">Si tu agente usa un framework con soporte x402 (el SDK de Coinbase, agentes con wallet viem/ethers), la negociación 402→pago es automática. Esta receta es el protocolo crudo, para cualquier stack.</span>
+  </div>
 
   <div class="step">
-    <h3><span class="n">1</span> Descubre el reto (llama sin pagar)</h3>
-    <p>El servicio responde <code>402</code> con el manifiesto de pago exacto: monto, moneda, red y destinatario.</p>
+    <h3><span class="n">1</span> <span data-es="Descubre el reto (llama sin pagar)" data-en="Discover the challenge (call without paying)">Descubre el reto (llama sin pagar)</span></h3>
+    <p data-es="El servicio responde 402 con el manifiesto de pago exacto: monto, moneda, red y destinatario." data-en="The service answers 402 with the exact payment manifest: amount, currency, network and payee.">El servicio responde 402 con el manifiesto de pago exacto: monto, moneda, red y destinatario.</p>
     <pre>curl -s -X POST https://phantom-receipt-verify.onrender.com/verify \
   -H "content-type: application/json" -d '{}'
 # → 402 { "accepts": [{ "scheme": "exact", "network": "eip155:8453",
@@ -64,8 +96,8 @@
   </div>
 
   <div class="step">
-    <h3><span class="n">2</span> Firma la autorización de pago (EIP-3009)</h3>
-    <p>Tu agente firma <code>TransferWithAuthorization</code> con la clave de su wallet: monto exacto del reto, destinatario exacto, validez corta. Es una firma, no una transacción: no gasta gas ni mueve nada todavía.</p>
+    <h3><span class="n">2</span> <span data-es="Firma la autorización de pago (EIP-3009)" data-en="Sign the payment authorization (EIP-3009)">Firma la autorización de pago (EIP-3009)</span></h3>
+    <p data-es="Tu agente firma TransferWithAuthorization con la clave de su wallet: monto exacto del reto, destinatario exacto, validez corta. Es una firma, no una transacción: no gasta gas ni mueve nada todavía." data-en="Your agent signs TransferWithAuthorization with its wallet key: exact challenge amount, exact payee, short validity. It's a signature, not a transaction: no gas, nothing moves yet.">Tu agente firma <code>TransferWithAuthorization</code> con la clave de su wallet: monto exacto del reto, destinatario exacto, validez corta. Es una firma, no una transacción: no gasta gas ni mueve nada todavía.</p>
     <pre>const auth = { from: agent.address, to: req.payTo, value: req.amount,
   validAfter: now - 60, validBefore: now + 900, nonce: randomBytes32() };
 const signature = await agent.signTypedData(
@@ -78,8 +110,8 @@ const signature = await agent.signTypedData(
   </div>
 
   <div class="step">
-    <h3><span class="n">3</span> Envía el pago en el header X-Payment</h3>
-    <p>El header es el JSON del pago en base64. Incluye el receipt a verificar en el cuerpo.</p>
+    <h3><span class="n">3</span> <span data-es="Envía el pago en el header X-Payment" data-en="Send the payment in the X-Payment header">Envía el pago en el header X-Payment</span></h3>
+    <p data-es="El header es el JSON del pago en base64. Incluye el receipt a verificar en el cuerpo." data-en="The header is the payment JSON in base64. Include the receipt to verify in the body.">El header es el JSON del pago en base64. Incluye el receipt a verificar en el cuerpo.</p>
     <pre>const xPayment = btoa(JSON.stringify({
   x402Version: 2, scheme: "exact", network: "eip155:8453",
   payload: { signature, authorization: auth },
@@ -92,8 +124,8 @@ const res = await fetch("https://phantom-receipt-verify.onrender.com/verify", {
   </div>
 
   <div class="step">
-    <h3><span class="n">4</span> Recibe veredicto + comprobante de liquidación</h3>
-    <p>El servicio valida la firma, consulta al facilitator (Coinbase CDP) y <b>liquida on-chain automáticamente</b>. La respuesta incluye el hash de la transacción real.</p>
+    <h3><span class="n">4</span> <span data-es="Recibe veredicto + comprobante de liquidación" data-en="Receive verdict + settlement proof">Recibe veredicto + comprobante de liquidación</span></h3>
+    <p data-es-html="El servicio valida la firma, consulta al facilitator (Coinbase CDP) y <b>liquida on-chain automáticamente</b>. La respuesta incluye el hash de la transacción real." data-en-html="The service validates the signature, asks the facilitator (Coinbase CDP) and <b>settles on-chain automatically</b>. The response includes the real transaction hash.">El servicio valida la firma, consulta al facilitator (Coinbase CDP) y <b>liquida on-chain automáticamente</b>. La respuesta incluye el hash de la transacción real.</p>
     <pre>// 200
 { "payment": { "payer": "0xTuAgente…", "settled": true,
                "transaction": "0x1840…5dce" },   // ← liquidación real en Base
@@ -101,19 +133,74 @@ const res = await fetch("https://phantom-receipt-verify.onrender.com/verify", {
                "onChainState": "free", "authHash": "0x…" } }</pre>
   </div>
 
-  <h2>Puntos de entrada para tu agente</h2>
+  <h2 data-es="Conector MCP — una línea de config" data-en="MCP connector — one line of config">Conector MCP — una línea de config</h2>
+  <p style="color:var(--muted);font-size:14.5px;max-width:660px" data-es-html="Paquete oficial en npm: <code>@phantomid/mcp-server</code>. Expone las tools de cobro/pago a cualquier agente MCP (Claude Code, Codex, Cursor…). Sin claves: la API de registro cobra su propia tarifa por adelantado." data-en-html="Official npm package: <code>@phantomid/mcp-server</code>. Exposes payment tools to any MCP agent (Claude Code, Codex, Cursor…). No keys needed: the registration API charges its own fee upfront.">Paquete oficial en npm: <code>@phantomid/mcp-server</code>. Expone las tools de cobro/pago a cualquier agente MCP (Claude Code, Codex, Cursor…). Sin claves: la API de registro cobra su propia tarifa por adelantado.</p>
+
+  <div class="mcp-block">
+    <div class="mcp-label">Claude Code · .mcp.json</div>
+    <pre>{
+  "mcpServers": {
+    "idphantom": {
+      "command": "npx",
+      "args": ["-y", "@phantomid/mcp-server"]
+    }
+  }
+}</pre>
+  </div>
+
+  <div class="mcp-block">
+    <div class="mcp-label">Codex · ~/.codex/config.toml</div>
+    <pre>[mcp_servers.idphantom]
+command = "npx"
+args = ["-y", "@phantomid/mcp-server"]</pre>
+  </div>
+
+  <div class="mcp-block">
+    <div class="mcp-label">Smithery · cualquier cliente</div>
+    <pre>npx -y @smithery/cli@latest install arbromagency/idphantom-mcp-server --client claude</pre>
+    <p style="color:var(--muted);font-size:13px;margin-top:8px" data-es-html="Listado verificado: <a href=&quot;https://smithery.ai/servers/arbromagency/idphantom-mcp-server&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;>smithery.ai/servers/arbromagency/idphantom-mcp-server</a> · Skill reutilizable para agentes: <a href=&quot;/SKILL.md&quot;>idphantom-pay</a>." data-en-html="Verified listing: <a href=&quot;https://smithery.ai/servers/arbromagency/idphantom-mcp-server&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;>smithery.ai/servers/arbromagency/idphantom-mcp-server</a> · Reusable agent skill: <a href=&quot;/SKILL.md&quot;>idphantom-pay</a>.">Listado verificado: <a href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">smithery.ai/servers/arbromagency/idphantom-mcp-server</a> · Skill reutilizable para agentes: <a href="/SKILL.md">idphantom-pay</a>.</p>
+  </div>
+
+  <h2 data-es="Puntos de entrada para tu agente" data-en="Entry points for your agent">Puntos de entrada para tu agente</h2>
   <div class="grid">
-    <div class="card"><b>Manifiesto x402 (descubrimiento)</b><p><a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">/.well-known/x402</a> — formato estándar para agentes x402.</p></div>
-    <div class="card"><b>OpenAPI</b><p><a href="https://phantom-receipt-verify.onrender.com/openapi.json" target="_blank" rel="noopener">/openapi.json</a> — esquema completo del endpoint /verify.</p></div>
-    <div class="card"><b>Conector MCP</b><p><a href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">idphantom-mcp-server</a> — para Claude, Cursor y agentes MCP.</p></div>
-    <div class="card"><b>Red y moneda</b><p>Base mainnet (eip155:8453), USDC nativo 0x833589…A02913. Tu agente solo necesita saldo USDC: el gas del settlement lo paga el facilitator.</p></div>
+    <div class="card"><b data-es="Manifiesto x402 (descubrimiento)" data-en="x402 manifest (discovery)">Manifiesto x402 (descubrimiento)</b><p><a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">/.well-known/x402</a> — <span data-es="formato estándar para agentes x402." data-en="standard format for x402 agents.">formato estándar para agentes x402.</span></p></div>
+    <div class="card"><b>OpenAPI</b><p><a href="https://phantom-receipt-verify.onrender.com/openapi.json" target="_blank" rel="noopener">/openapi.json</a> — <span data-es="esquema completo del endpoint /verify." data-en="full /verify endpoint schema.">esquema completo del endpoint /verify.</span></p></div>
+    <div class="card"><b>MCP / Smithery</b><p><a href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">idphantom-mcp-server</a> — <span data-es="para Claude, Codex, Cursor y agentes MCP." data-en="for Claude, Codex, Cursor and MCP agents.">para Claude, Codex, Cursor y agentes MCP.</span></p></div>
+    <div class="card"><b data-es="Red y moneda" data-en="Network and currency">Red y moneda</b><p data-es="Base mainnet (eip155:8453), USDC nativo 0x833589…A02913. Tu agente solo necesita saldo USDC: el gas del settlement lo paga el facilitator." data-en="Base mainnet (eip155:8453), native USDC 0x833589…A02913. Your agent only needs a USDC balance: the facilitator pays settlement gas.">Base mainnet (eip155:8453), USDC nativo 0x833589…A02913. Tu agente solo necesita saldo USDC: el gas del settlement lo paga el facilitator.</p></div>
   </div>
 </div></section>
 
 <footer>
-  IDPHANTOM — DatalabiA · pagos agente-a-agente estándar x402 ·
-  demo para humanos: <a href="/demo.html">idphantom.com/demo.html</a>
+  IDPHANTOM — DatalabiA · <span data-es="pagos agente-a-agente estándar x402" data-en="agent-to-agent payments, x402 standard">pagos agente-a-agente estándar x402</span> ·
+  <span data-es="demo para humanos" data-en="demo for humans">demo para humanos</span>: <a href="/demo.html">idphantom.com/demo.html</a>
 </footer>
+
+<script>
+(function(){
+  function applyLang(l){
+    document.querySelectorAll('[data-es]').forEach(function(el){
+      var v = el.getAttribute('data-' + l); if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-es-html]').forEach(function(el){
+      var v = el.getAttribute('data-' + l + '-html'); if (v != null) el.innerHTML = v;
+    });
+    document.querySelectorAll('[data-es-title]').forEach(function(el){
+      var v = el.getAttribute('data-' + l + '-title'); if (v != null) el.textContent = v;
+    });
+    document.documentElement.lang = l;
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('on', b.dataset.lang === l);
+    });
+    try{ localStorage.setItem('idph-lang', l); }catch(e){}
+  }
+  var saved = null; try{ saved = localStorage.getItem('idph-lang'); }catch(e){}
+  var lang = saved || ((navigator.language||'es').toLowerCase().indexOf('es') === 0 ? 'es' : 'en');
+  window.setLang = applyLang;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ applyLang(lang); });
+  } else { applyLang(lang); }
+})();
+</script>
 
 </body>
 </html>

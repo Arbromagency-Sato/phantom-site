@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demo en vivo — IDPHANTOM</title>
+<title data-es-title="Demo en vivo — IDPHANTOM" data-en-title="Live demo — IDPHANTOM">Demo en vivo — IDPHANTOM</title>
 <link rel="icon" type="image/png" href="/favicon.png">
-<meta name="description" content="Demo pública de IDPHANTOM: paga $0.01 USDC en Base mainnet con el estándar x402 y recibe un veredicto criptográfico al instante. Dinero real, sin registros.">
+<meta name="description" content="Public IDPHANTOM demo: pay $0.01 USDC on Base mainnet with the x402 standard and get a cryptographic verdict instantly. Real money, no signup.">
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"
   integrity="sha512-V3xRGsQMQ8CG4l2gVN44TCDmNY5cdlxbSvejrgmWxcLKHft0Q3XQDbeuJ9aot14mpNuRWGtI//WKraedDGNZ+g=="
   crossorigin="anonymous"></script>
@@ -19,18 +19,30 @@
   .wrap{max-width:860px;margin:0 auto;padding:0 24px}
   a{color:var(--cyan);text-decoration:none}
   a:hover{text-decoration:underline}
-  header{border-bottom:1px solid var(--line);padding:18px 0}
-  header .wrap{display:flex;justify-content:space-between;align-items:center}
-  .logo{font-weight:800;font-size:18px;letter-spacing:1px}
-  .logo span{color:var(--cyan)}
+
+  /* TOPBAR (misma identidad que index) */
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 24px;background:rgba(5,7,13,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand img{height:30px;width:30px;object-fit:contain}
+  .brand b{font-size:17px;letter-spacing:1.5px;font-weight:800}
+  .brand b span{color:var(--cyan)}
+  .topnav{display:flex;align-items:center;gap:18px}
+  .topnav a{color:var(--muted);font-size:13.5px;font-weight:600}
+  .topnav a:hover{color:var(--cyan);text-decoration:none}
+  .lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .lang button{background:transparent;border:0;color:var(--muted);font-size:12px;font-weight:700;
+    padding:6px 11px;cursor:pointer;font-family:inherit}
+  .lang button.on{background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F}
+
   section{padding:56px 0;border-top:1px solid var(--line)}
   .kicker{color:var(--cyan);font-size:12.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
   h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:10px 0 14px;line-height:1.15}
   h2{font-size:20px;margin:26px 0 10px}
   p.lead{color:var(--muted);max-width:640px;font-size:16px}
   .step{border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:18px;background:linear-gradient(180deg,var(--bg2),var(--bg))}
-  .step h3{font-size:16px;display:flex;align-items:center;gap:10px}
-  .step h3 .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F;font-weight:800;align-items:center;justify-content:center;font-size:13px}
+  .step h3{font-size:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .step h3 .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#04121F;font-weight:800;align-items:center;justify-content:center;font-size:13px;flex:none}
   .step p{color:var(--muted);font-size:14px;margin-top:8px}
   .btn{display:inline-block;margin-top:14px;padding:11px 22px;border-radius:10px;font-weight:700;color:#04121F;border:0;cursor:pointer;font-size:14.5px;
     background:linear-gradient(90deg,var(--blue),var(--cyan));transition:.2s}
@@ -43,7 +55,8 @@
   .tag.ok{background:rgba(57,217,138,.15);color:var(--ok)}
   .tag.err{background:rgba(255,107,107,.15);color:var(--err)}
   .good{border:1px solid rgba(57,217,138,.4);border-radius:14px;padding:22px;margin-top:18px;background:linear-gradient(180deg,rgba(57,217,138,.06),transparent)}
-  .good h3{color:var(--ok)}
+  .good h3{color:var(--ok);display:flex;align-items:center;gap:10px}
+  .good h3 svg{width:20px;height:20px;flex:none}
   .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
   .pill{border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--muted)}
   .pill b{color:var(--ink)}
@@ -52,64 +65,140 @@
 </head>
 <body>
 
-<header><div class="wrap">
-  <div class="logo">ID<span>PHANTOM</span></div>
-  <a href="/">← Volver a la web</a>
-</div></header>
+<div class="topbar">
+  <div class="brand">
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+      <img src="/logo.png" alt="IDPHANTOM">
+      <b>ID<span>PHANTOM</span></b>
+    </a>
+  </div>
+  <div class="topnav">
+    <a href="/agents.html" data-es="Para agentes" data-en="For agents">Para agentes</a>
+    <a href="/" data-es="← Volver a la web" data-en="← Back to site">← Volver a la web</a>
+    <div class="lang">
+      <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
 
 <section style="border-top:0"><div class="wrap">
-  <div class="kicker">Demo en vivo · Base mainnet · dinero real</div>
-  <h1>Compra un veredicto por <span style="color:var(--cyan)">$0.01 USDC</span></h1>
-  <p class="lead">Así es como un agente (o un humano) paga por una API sin registros ni tarjetas: el servicio responde <code>402 Payment Required</code>, firmas una autorización EIP-3009 con tu wallet y recibes el resultado al instante. Aquí lo haces tú, paso a paso, con MetaMask.</p>
+  <div class="kicker" data-es="Demo en vivo · Base mainnet · dinero real" data-en="Live demo · Base mainnet · real money">Demo en vivo · Base mainnet · dinero real</div>
+  <h1 data-es-html="Compra un veredicto por <span style=&quot;color:var(--cyan)&quot;>$0.01 USDC</span>" data-en-html="Buy a verdict for <span style=&quot;color:var(--cyan)&quot;>$0.01 USDC</span>">Compra un veredicto por <span style="color:var(--cyan)">$0.01 USDC</span></h1>
+  <p class="lead" data-es="Así es como un agente (o un humano) paga por una API sin registros ni tarjetas: el servicio responde 402 Payment Required, firmas una autorización EIP-3009 con tu wallet y recibes el resultado al instante. Aquí lo haces tú, paso a paso, con MetaMask." data-en="This is how an agent (or a human) pays for an API with no signup and no cards: the service answers 402 Payment Required, you sign an EIP-3009 authorization with your wallet and get the result instantly. Here you do it yourself, step by step, with MetaMask.">Así es como un agente (o un humano) paga por una API sin registros ni tarjetas: el servicio responde 402 Payment Required, firmas una autorización EIP-3009 con tu wallet y recibes el resultado al instante. Aquí lo haces tú, paso a paso, con MetaMask.</p>
 
   <div class="step" id="s1">
-    <h3><span class="n">1</span> Ver el reto 402 <span class="tag wait" id="t1">sin probar</span></h3>
-    <p>Llama al servicio sin pagar: te rechaza con el estándar x402 y te dice exactamente qué pago acepta (monto, moneda, red y destinatario).</p>
-    <button class="btn ghost" id="b1" onclick="step402()">Probar sin pagar</button>
+    <h3><span class="n">1</span> <span data-es="Ver el reto 402" data-en="See the 402 challenge">Ver el reto 402</span> <span class="tag wait" id="t1" data-es="sin probar" data-en="not tried">sin probar</span></h3>
+    <p data-es="Llama al servicio sin pagar: te rechaza con el estándar x402 y te dice exactamente qué pago acepta (monto, moneda, red y destinatario)." data-en="Call the service without paying: it rejects you with the x402 standard and tells you exactly which payment it accepts (amount, currency, network and payee).">Llama al servicio sin pagar: te rechaza con el estándar x402 y te dice exactamente qué pago acepta (monto, moneda, red y destinatario).</p>
+    <button class="btn ghost" id="b1" onclick="step402()" data-es="Probar sin pagar" data-en="Try without paying">Probar sin pagar</button>
     <pre id="o1" style="display:none"></pre>
   </div>
 
   <div class="step" id="s2">
-    <h3><span class="n">2</span> Conectar MetaMask <span class="tag wait" id="t2">desconectado</span></h3>
-    <p>Necesitas Base mainnet y ~$0.01 USDC + unos céntimos de ETH para el gas de la liquidación. La firma del pago (paso 4) no gasta gas: solo la liquidación on-chain (paso 5).</p>
-    <button class="btn ghost" id="b2" onclick="connect()" disabled>Conectar wallet</button>
+    <h3><span class="n">2</span> <span data-es="Conectar MetaMask" data-en="Connect MetaMask">Conectar MetaMask</span> <span class="tag wait" id="t2" data-es="desconectado" data-en="disconnected">desconectado</span></h3>
+    <p data-es="Necesitas Base mainnet y ~$0.01 USDC + unos céntimos de ETH para el gas de la liquidación. La firma del pago (paso 4) no gasta gas: solo la liquidación on-chain (paso 5)." data-en="You need Base mainnet and ~$0.01 USDC + a few cents of ETH for settlement gas. The payment signature (step 4) costs no gas: only the on-chain settlement does (step 5).">Necesitas Base mainnet y ~$0.01 USDC + unos céntimos de ETH para el gas de la liquidación. La firma del pago (paso 4) no gasta gas: solo la liquidación on-chain (paso 5).</p>
+    <button class="btn ghost" id="b2" onclick="connect()" disabled data-es="Conectar wallet" data-en="Connect wallet">Conectar wallet</button>
     <pre id="o2" style="display:none"></pre>
   </div>
 
   <div class="step" id="s3">
-    <h3><span class="n">3</span> Firmar el recibo de demostración <span class="tag wait" id="t3">pendiente</span></h3>
-    <p>Un receipt IDPHANTOM es un <code>PaymentAuthorization</code> firmado con EIP-712 (dominio PhantomPay). Aquí firmas uno de juguete sobre tu propia wallet para verificarlo después.</p>
-    <button class="btn ghost" id="b3" onclick="signReceipt()" disabled>Firmar receipt (gratis)</button>
+    <h3><span class="n">3</span> <span data-es="Firmar el recibo de demostración" data-en="Sign the demo receipt">Firmar el recibo de demostración</span> <span class="tag wait" id="t3" data-es="pendiente" data-en="pending">pendiente</span></h3>
+    <p data-es-html="Un receipt IDPHANTOM es un <code>PaymentAuthorization</code> firmado con EIP-712 (dominio PhantomPay). Aquí firmas uno de juguete sobre tu propia wallet para verificarlo después." data-en-html="An IDPHANTOM receipt is an EIP-712-signed <code>PaymentAuthorization</code> (PhantomPay domain). Here you sign a toy one over your own wallet to verify it afterwards.">Un receipt IDPHANTOM es un <code>PaymentAuthorization</code> firmado con EIP-712 (dominio PhantomPay). Aquí firmas uno de juguete sobre tu propia wallet para verificarlo después.</p>
+    <button class="btn ghost" id="b3" onclick="signReceipt()" disabled data-es="Firmar receipt (gratis)" data-en="Sign receipt (free)">Firmar receipt (gratis)</button>
     <pre id="o3" style="display:none"></pre>
   </div>
 
   <div class="step" id="s4">
-    <h3><span class="n">4</span> Pagar $0.01 (firma EIP-3009) <span class="tag wait" id="t4">pendiente</span></h3>
-    <p>Firmas una autorización <code>TransferWithAuthorization</code> de $0.01 USDC a la wallet del servicio. Es la firma de un cheque, no un envío: aún no se mueve nada.</p>
-    <button class="btn" id="b4" onclick="payAndVerify()" disabled>Pagar $0.01 y verificar</button>
+    <h3><span class="n">4</span> <span data-es="Pagar $0.01 (firma EIP-3009)" data-en="Pay $0.01 (EIP-3009 signature)">Pagar $0.01 (firma EIP-3009)</span> <span class="tag wait" id="t4" data-es="pendiente" data-en="pending">pendiente</span></h3>
+    <p data-es-html="Firmas una autorización <code>TransferWithAuthorization</code> de $0.01 USDC a la wallet del servicio. Es la firma de un cheque, no un envío: aún no se mueve nada." data-en-html="You sign a $0.01 USDC <code>TransferWithAuthorization</code> to the service's wallet. It's a cheque signature, not a transfer: nothing moves yet.">Firmas una autorización <code>TransferWithAuthorization</code> de $0.01 USDC a la wallet del servicio. Es la firma de un cheque, no un envío: aún no se mueve nada.</p>
+    <button class="btn" id="b4" onclick="payAndVerify()" disabled data-es="Pagar $0.01 y verificar" data-en="Pay $0.01 and verify">Pagar $0.01 y verificar</button>
     <pre id="o4" style="display:none"></pre>
   </div>
 
   <div class="step" id="s5">
-    <h3><span class="n">5</span> Liquidar en cadena <span class="tag wait" id="t5">pendiente</span></h3>
-    <p>Aquí el dinero se mueve de verdad: tu wallet envía la autorización firmada al contrato USDC y el servicio cobra sus $0.01. Gas en Base: menos de un céntimo.</p>
-    <button class="btn" id="b5" onclick="settle()" disabled>Liquidar $0.01 on-chain</button>
+    <h3><span class="n">5</span> <span data-es="Liquidar en cadena" data-en="Settle on-chain">Liquidar en cadena</span> <span class="tag wait" id="t5" data-es="pendiente" data-en="pending">pendiente</span></h3>
+    <p data-es="Aquí el dinero se mueve de verdad: tu wallet envía la autorización firmada al contrato USDC y el servicio cobra sus $0.01. Gas en Base: menos de un céntimo." data-en="Here the money really moves: your wallet submits the signed authorization to the USDC contract and the service collects its $0.01. Gas on Base: less than one cent.">Aquí el dinero se mueve de verdad: tu wallet envía la autorización firmada al contrato USDC y el servicio cobra sus $0.01. Gas en Base: menos de un céntimo.</p>
+    <button class="btn" id="b5" onclick="settle()" disabled data-es="Liquidar $0.01 on-chain" data-en="Settle $0.01 on-chain">Liquidar $0.01 on-chain</button>
     <pre id="o5" style="display:none"></pre>
   </div>
 
   <div class="good" id="cert" style="display:none">
-    <h3>✅ Veredicto criptográfico entregado</h3>
-    <p style="color:var(--muted);font-size:14px;margin-top:6px">Esto es el «bien digital» que acabas de comprar: la comprobación firmada de que el receipt es válido. Un agente recibiría exactamente esto, automáticamente.</p>
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg> <span data-es="Veredicto criptográfico entregado" data-en="Cryptographic verdict delivered">Veredicto criptográfico entregado</span></h3>
+    <p style="color:var(--muted);font-size:14px;margin-top:6px" data-es="Esto es el «bien digital» que acabas de comprar: la comprobación firmada de que el receipt es válido. Un agente recibiría exactamente esto, automáticamente." data-en="This is the digital good you just bought: the signed check that the receipt is valid. An agent would receive exactly this, automatically.">Esto es el «bien digital» que acabas de comprar: la comprobación firmada de que el receipt es válido. Un agente recibiría exactamente esto, automáticamente.</p>
     <div class="row" id="certRows"></div>
     <pre id="certJson"></pre>
   </div>
 </div></section>
 
 <footer>
-  IDPHANTOM — DatalabiA · cobro x402 / EIP-3009 en Base mainnet ·
-  servicio: <a href="https://phantom-receipt-verify.onrender.com" target="_blank" rel="noopener">phantom-receipt-verify</a> ·
-  manifiesto: <a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">.well-known/x402</a>
+  IDPHANTOM — DatalabiA · <span data-es="cobro x402 / EIP-3009 en Base mainnet" data-en="x402 / EIP-3009 charging on Base mainnet">cobro x402 / EIP-3009 en Base mainnet</span> ·
+  <span data-es="servicio" data-en="service">servicio</span>: <a href="https://phantom-receipt-verify.onrender.com" target="_blank" rel="noopener">phantom-receipt-verify</a> ·
+  <span data-es="manifiesto" data-en="manifest">manifiesto</span>: <a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">.well-known/x402</a>
 </footer>
+
+<script>
+/* ============ i18n (mismo sistema que index.html) ============ */
+let LANG = "es";
+const I = {
+  es: {
+    alertPayTo: "ALERTA DE SEGURIDAD: el servicio devolvió un destinatario, moneda o red distintos a los oficiales de IDPHANTOM. No continues y avísanos. Recibido: ",
+    tUnexpectedPayee: "destinatario inesperado", t402: "402 recibido", tUnexpected: "respuesta inesperada", tError: "error",
+    noMetamask: "MetaMask no detectado. Instálalo o usa un navegador con wallet.",
+    walletConnected: "Wallet: ", network: "Red: Base mainnet (8453)",
+    tDisconnected: "desconectado", tConnected: "conectado", tPending: "pendiente", tSigned: "firmado",
+    needStep1: "primero ejecuta el paso 1 (reto 402)",
+    tPaid: "pagado · HTTP 200", tSettled: "liquidado",
+    txSent: "Transacción enviada: ", waiting: "Esperando confirmación…",
+    block: "bloque", explorer: "explorador",
+    settledNote: "Los $0.01 USDC ya están en la wallet del servicio. Liquidación real en Base mainnet.",
+    viewBasescan: "Ver en Basescan →",
+    sigCheck: "Firma EIP-712", expiry: "Expiración", onchain: "Estado on-chain", paymentLbl: "Pago",
+    valid: "válida", invalid: "inválida", live: "vigente", expired: "vencida", settledBy: "verificado por facilitator"
+  },
+  en: {
+    alertPayTo: "SECURITY ALERT: the service returned a payee, currency or network different from IDPHANTOM's official ones. Do not continue and let us know. Received: ",
+    tUnexpectedPayee: "unexpected payee", t402: "402 received", tUnexpected: "unexpected response", tError: "error",
+    noMetamask: "MetaMask not detected. Install it or use a wallet-enabled browser.",
+    walletConnected: "Wallet: ", network: "Network: Base mainnet (8453)",
+    tDisconnected: "disconnected", tConnected: "connected", tPending: "pending", tSigned: "signed",
+    needStep1: "run step 1 first (402 challenge)",
+    tPaid: "paid · HTTP 200", tSettled: "settled",
+    txSent: "Transaction sent: ", waiting: "Waiting for confirmation…",
+    block: "block", explorer: "explorer",
+    settledNote: "The $0.01 USDC are now in the service's wallet. Real settlement on Base mainnet.",
+    viewBasescan: "View on Basescan →",
+    sigCheck: "EIP-712 signature", expiry: "Expiry", onchain: "On-chain state", paymentLbl: "Payment",
+    valid: "valid", invalid: "invalid", live: "in force", expired: "expired", settledBy: "verified by facilitator"
+  }
+};
+function t(k){ return I[LANG][k]; }
+
+(function(){
+  function applyLang(l){
+    LANG = l;
+    document.querySelectorAll('[data-es]').forEach(function(el){
+      var v = el.getAttribute('data-' + l); if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-es-html]').forEach(function(el){
+      var v = el.getAttribute('data-' + l + '-html'); if (v != null) el.innerHTML = v;
+    });
+    document.querySelectorAll('[data-es-title]').forEach(function(el){
+      var v = el.getAttribute('data-' + l + '-title'); if (v != null) el.textContent = v;
+    });
+    document.documentElement.lang = l;
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('on', b.dataset.lang === l);
+    });
+    try{ localStorage.setItem('idph-lang', l); }catch(e){}
+  }
+  var saved = null; try{ saved = localStorage.getItem('idph-lang'); }catch(e){}
+  var lang = saved || ((navigator.language||'es').toLowerCase().indexOf('es') === 0 ? 'es' : 'en');
+  window.setLang = applyLang;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ applyLang(lang); });
+  } else { applyLang(lang); }
+})();
+</script>
 
 <script>
 const VERIFY_URL = "https://phantom-receipt-verify.onrender.com/verify";
@@ -144,19 +233,19 @@ async function step402() {
       if (challenge.payTo.toLowerCase() !== EXPECTED_PAYTO.toLowerCase() ||
           challenge.asset.toLowerCase() !== USDC.toLowerCase() ||
           challenge.network !== "eip155:" + CHAIN_ID) {
-        show("o1", "ALERTA DE SEGURIDAD: el servicio devolvió un destinatario, moneda o red distintos a los oficiales de IDPHANTOM. No continues y avísanos. Recibido: " + JSON.stringify({ payTo: challenge.payTo, asset: challenge.asset, network: challenge.network }));
-        tag("t1", "destinatario inesperado", "err");
+        show("o1", t("alertPayTo") + JSON.stringify({ payTo: challenge.payTo, asset: challenge.asset, network: challenge.network }));
+        tag("t1", t("tUnexpectedPayee"), "err");
         return;
       }
-      tag("t1", "402 recibido", "ok");
+      tag("t1", t("t402"), "ok");
       $("b2").disabled = false;
-    } else { tag("t1", "respuesta inesperada", "err"); }
-  } catch (e) { show("o1", "Error: " + e.message); tag("t1", "error", "err"); }
+    } else { tag("t1", t("tUnexpected"), "err"); }
+  } catch (e) { show("o1", "Error: " + e.message); tag("t1", t("tError"), "err"); }
   $("b1").disabled = false;
 }
 
 async function connect() {
-  if (!window.ethereum) { show("o2", "MetaMask no detectado. Instálalo o usa un navegador con wallet."); return; }
+  if (!window.ethereum) { show("o2", t("noMetamask")); return; }
   $("b2").disabled = true;
   try {
     provider = new ethers.BrowserProvider(window.ethereum);
@@ -169,10 +258,10 @@ async function connect() {
         await provider.send("wallet_addChain", [{ chainId: "0x" + CHAIN_ID.toString(16), chainName: "Base", nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }, rpcUrls: ["https://mainnet.base.org"], blockExplorerUrls: ["https://basescan.org"] }]);
       } else throw e;
     }
-    show("o2", "Wallet: " + user + "\nRed: Base mainnet (8453)");
-    tag("t2", "conectado", "ok");
+    show("o2", t("walletConnected") + user + "\n" + t("network"));
+    tag("t2", t("tConnected"), "ok");
     $("b3").disabled = false;
-  } catch (e) { show("o2", "Error: " + (e.message || e)); tag("t2", "error", "err"); }
+  } catch (e) { show("o2", "Error: " + (e.message || e)); tag("t2", t("tError"), "err"); }
   $("b2").disabled = false;
 }
 
@@ -203,16 +292,16 @@ async function signReceipt() {
       receipt
     );
     show("o3", { receipt, signature: receiptSig });
-    tag("t3", "firmado", "ok");
+    tag("t3", t("tSigned"), "ok");
     $("b4").disabled = false;
-  } catch (e) { show("o3", "Error: " + (e.message || e)); tag("t3", "error", "err"); }
+  } catch (e) { show("o3", "Error: " + (e.message || e)); tag("t3", t("tError"), "err"); }
   $("b3").disabled = false;
 }
 
 async function payAndVerify() {
   $("b4").disabled = true;
   try {
-    if (!challenge) throw new Error("primero ejecuta el paso 1 (reto 402)");
+    if (!challenge) throw new Error(t("needStep1"));
     const now = Math.floor(Date.now() / 1000);
     const auth = {
       from: user,
@@ -246,11 +335,11 @@ async function payAndVerify() {
     show("o4", { httpStatus: res.status, body });
     if (res.status === 200 && body.receipt) {
       verdict = body;
-      tag("t4", "pagado · HTTP 200", "ok");
+      tag("t4", t("tPaid"), "ok");
       $("b5").disabled = false;
       renderCert(body);
     } else tag("t4", "HTTP " + res.status, "err");
-  } catch (e) { show("o4", "Error: " + (e.message || e)); tag("t4", "error", "err"); }
+  } catch (e) { show("o4", "Error: " + (e.message || e)); tag("t4", t("tError"), "err"); }
   $("b4").disabled = false;
 }
 
@@ -262,32 +351,39 @@ async function settle() {
       payment.from, payment.to, payment.value,
       payment.validAfter, payment.validBefore, payment.nonce, paymentSig
     );
-    show("o5", "Transacción enviada: " + tx.hash + "\nEsperando confirmación…");
+    show("o5", t("txSent") + tx.hash + "\n" + t("waiting"));
     const rcpt = await tx.wait();
-    tag("t5", "liquidado", "ok");
+    tag("t5", t("tSettled"), "ok");
     show("o5", {
       txHash: tx.hash,
-      bloque: rcpt.blockNumber,
-      explorador: "https://basescan.org/tx/" + tx.hash,
-      nota: "Los $0.01 USDC ya están en la wallet del servicio. Liquidación real en Base mainnet.",
+      [t("block")]: rcpt.blockNumber,
+      [t("explorer")]: "https://basescan.org/tx/" + tx.hash,
+      note: t("settledNote"),
     });
     const a = document.createElement("a");
     a.href = "https://basescan.org/tx/" + tx.hash; a.target = "_blank"; a.rel = "noopener";
-    a.textContent = "Ver en Basescan →";
+    a.textContent = t("viewBasescan");
     a.style.cssText = "display:inline-block;margin-top:12px;font-weight:700";
     $("o5").after(a);
-  } catch (e) { show("o5", "Error: " + (e.message || e)); tag("t5", "error", "err"); }
+  } catch (e) { show("o5", "Error: " + (e.message || e)); tag("t5", t("tError"), "err"); }
   $("b5").disabled = false;
 }
+
+const ok = c => c
+  ? '<b style="color:var(--ok)">✓ ' + t("valid") + '</b>'
+  : '<b style="color:var(--err)">✕ ' + t("invalid") + '</b>';
+const okExp = c => c
+  ? '<b style="color:var(--ok)">✓ ' + t("live") + '</b>'
+  : '<b style="color:var(--err)">✕ ' + t("expired") + '</b>';
 
 function renderCert(body) {
   $("cert").style.display = "block";
   $("certRows").innerHTML = [
-    ["Firma EIP-712", body.receipt.checks.signatureValid ? "válida ✅" : "inválida ❌"],
-    ["Expiración", body.receipt.checks.notExpired ? "vigente ✅" : "vencida ❌"],
-    ["Estado on-chain", body.receipt.onChainState],
-    ["Pago", body.payment.settled === true ? "verificado por facilitator" : body.payment.settled],
-  ].map(([k, v]) => `<div class="pill">${k}: <b>${v}</b></div>`).join("");
+    [t("sigCheck"), ok(body.receipt.checks.signatureValid)],
+    [t("expiry"), okExp(body.receipt.checks.notExpired)],
+    [t("onchain"), "<b>" + body.receipt.onChainState + "</b>"],
+    [t("paymentLbl"), "<b>" + (body.payment.settled === true ? t("settledBy") : body.payment.settled) + "</b>"],
+  ].map(([k, v]) => `<div class="pill">${k}: ${v}</div>`).join("");
   $("certJson").textContent = JSON.stringify(body.receipt, null, 2);
 }
 </script>
