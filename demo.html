@@ -6,7 +6,9 @@
 <title>Demo en vivo — IDPHANTOM</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="description" content="Demo pública de IDPHANTOM: paga $0.01 USDC en Base mainnet con el estándar x402 y recibe un veredicto criptográfico al instante. Dinero real, sin registros.">
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"
+  integrity="sha512-V3xRGsQMQ8CG4l2gVN44TCDmNY5cdlxbSvejrgmWxcLKHft0Q3XQDbeuJ9aot14mpNuRWGtI//WKraedDGNZ+g=="
+  crossorigin="anonymous"></script>
 <style>
   :root{
     --bg:#05070D; --bg2:#0A0F1E; --ink:#EAF2FF; --muted:#8B9BB8;
@@ -114,6 +116,9 @@ const VERIFY_URL = "https://phantom-receipt-verify.onrender.com/verify";
 const CHAIN_ID = 8453;
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const ROUTER = "0x873E94fd0b9B7684B9ccfa2463D83Bf9eA8A8755";
+// Dirección OFICIAL de cobro. Si el servicio (o un intermediario) devuelve
+// otra, la demo se niega a continuar: protege contra sustitución de payTo.
+const EXPECTED_PAYTO = "0xdBACb05DD68949Ce4ddB2539279119B524B5C9f1";
 const USDC_ABI = ["function transferWithAuthorization(address from, address to, uint256 value, uint256 validAfter, uint256 validBefore, bytes32 nonce, bytes signature)"];
 
 let challenge = null;   // reto 402 (accepts[0])
@@ -135,6 +140,14 @@ async function step402() {
     show("o1", body);
     if (res.status === 402 && body.accepts && body.accepts[0]) {
       challenge = body.accepts[0];
+      // Verificación anti-sustitución: el destinatario debe ser el oficial.
+      if (challenge.payTo.toLowerCase() !== EXPECTED_PAYTO.toLowerCase() ||
+          challenge.asset.toLowerCase() !== USDC.toLowerCase() ||
+          challenge.network !== "eip155:" + CHAIN_ID) {
+        show("o1", "ALERTA DE SEGURIDAD: el servicio devolvió un destinatario, moneda o red distintos a los oficiales de IDPHANTOM. No continues y avísanos. Recibido: " + JSON.stringify({ payTo: challenge.payTo, asset: challenge.asset, network: challenge.network }));
+        tag("t1", "destinatario inesperado", "err");
+        return;
+      }
       tag("t1", "402 recibido", "ok");
       $("b2").disabled = false;
     } else { tag("t1", "respuesta inesperada", "err"); }
