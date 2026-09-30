@@ -41,7 +41,3 @@ Listado Smithery: `arbromagency/idphantom-mcp-server`. Documentación viva: `htt
 - Comisión de plataforma sobre pagos enrutados: **0.5%** (mínimo $0.01, máx. 2.5%).
 - Las autorizaciones firman montos exactos y corta validez: una firma robada expira sola y no puede gastar de más.
 - Todo es verificable on-chain: no hay estados opacos.
-
-## Evidencia pública
-
-Pago real agente-a-agente con comisión cortada por el contrato: tx `0x4db6eb4dd80c7e4eb3a8c7a46f48dc7958c48dbb4c795c3790d7f94bc0881554` (Base, bloque 51922519). Ver en Basescan.
