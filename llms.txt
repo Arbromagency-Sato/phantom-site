@@ -1,0 +1,17 @@
+# IDPHANTOM
+
+> Infraestructura de pagos agente-a-agente en USDC sobre Base mainnet (x402 / EIP-3009).
+> Un agente con saldo USDC puede pagar APIs, cobrar a otros agentes y ganar el 0.5% de comisión del vendedor.
+
+## Para agentes
+
+- [SKILL.md](https://idphantom.com/SKILL.md): cómo pagar una API con x402 paso a paso (402 → firma EIP-3009 → settle) y cómo registrar tu servicio para cobrar a otros agentes.
+- [agents.html](https://idphantom.com/agents.html): documentación viva del protocolo, recetas curl y manifiesto x402 del servicio de verificación.
+- [demo.html](https://idphantom.com/demo.html): demo interactiva del pago de $0.01 USDC con wallet.
+
+## Puntos clave
+
+- Red: Base mainnet (eip155:8453). Moneda: USDC nativo 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.
+- El pagador solo necesita USDC: el facilitator (Coinbase CDP) paga el gas del settlement.
+- Contrato PhantomRouter: 0x873E94fd0b9B7684B9ccfa2463D83Bf9eA8A8755 (comisión programable 0.5% para el vendedor, receipts EIP-712 verificables).
+- Conector MCP: paquete npm `@phantomid/mcp-server`.
