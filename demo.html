@@ -388,5 +388,30 @@ function renderCert(body) {
 }
 </script>
 
+
+<!-- Contador de visitas AGP-049 (Supabase, anon key publica por diseno, RLS insert-only) -->
+<script>
+(function(){
+  try {
+    var payload = JSON.stringify({
+      page: location.pathname,
+      referrer: (document.referrer || '').slice(0, 300) || null,
+      ua: (navigator.userAgent || '').slice(0, 200)
+    });
+    fetch('https://deroaoxcfrlwjbhojzgk.supabase.co/rest/v1/site_hits', {
+      method: 'POST',
+      headers: {
+        apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlcm9hb3hjZnJsd2piaG9qemdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0NzgxMTgsImV4cCI6MjEwNjA1NDExOH0.JFotAaVS33UKazYQegbLdG8vWvfTEoV3bxFeylB4AJo',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlcm9hb3hjZnJsd2piaG9qemdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0NzgxMTgsImV4cCI6MjEwNjA1NDExOH0.JFotAaVS33UKazYQegbLdG8vWvfTEoV3bxFeylB4AJo',
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: payload,
+      keepalive: true
+    }).catch(function(){});
+  } catch (e) {}
+})();
+</script>
+
 </body>
 </html>
