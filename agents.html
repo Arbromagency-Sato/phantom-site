@@ -88,7 +88,7 @@
   <div class="step">
     <h3><span class="n">1</span> <span data-es="Descubre el reto (llama sin pagar)" data-en="Discover the challenge (call without paying)">Descubre el reto (llama sin pagar)</span></h3>
     <p data-es="El servicio responde 402 con el manifiesto de pago exacto: monto, moneda, red y destinatario." data-en="The service answers 402 with the exact payment manifest: amount, currency, network and payee.">El servicio responde 402 con el manifiesto de pago exacto: monto, moneda, red y destinatario.</p>
-    <pre>curl -s -X POST https://phantom-receipt-verify.onrender.com/verify \
+    <pre>curl -s -X POST https://api.idphantom.com/verify \
   -H "content-type: application/json" -d '{}'
 # → 402 { "accepts": [{ "scheme": "exact", "network": "eip155:8453",
 #      "amount": "10000", "asset": "0x833589…A02913"  /* USDC Base */,
@@ -116,7 +116,7 @@ const signature = await agent.signTypedData(
   x402Version: 2, scheme: "exact", network: "eip155:8453",
   payload: { signature, authorization: auth },
 }));
-const res = await fetch("https://phantom-receipt-verify.onrender.com/verify", {
+const res = await fetch("https://api.idphantom.com/verify", {
   method: "POST",
   headers: { "content-type": "application/json", "X-Payment": xPayment },
   body: JSON.stringify(receipt),  // PaymentAuthorization EIP-712 (dominio PhantomPay v1)
@@ -163,8 +163,8 @@ args = ["-y", "@phantomid/mcp-server"]</pre>
 
   <h2 data-es="Puntos de entrada para tu agente" data-en="Entry points for your agent">Puntos de entrada para tu agente</h2>
   <div class="grid">
-    <div class="card"><b data-es="Manifiesto x402 (descubrimiento)" data-en="x402 manifest (discovery)">Manifiesto x402 (descubrimiento)</b><p><a href="https://phantom-receipt-verify.onrender.com/.well-known/x402" target="_blank" rel="noopener">/.well-known/x402</a> — <span data-es="formato estándar para agentes x402." data-en="standard format for x402 agents.">formato estándar para agentes x402.</span></p></div>
-    <div class="card"><b>OpenAPI</b><p><a href="https://phantom-receipt-verify.onrender.com/openapi.json" target="_blank" rel="noopener">/openapi.json</a> — <span data-es="esquema completo del endpoint /verify." data-en="full /verify endpoint schema.">esquema completo del endpoint /verify.</span></p></div>
+    <div class="card"><b data-es="Manifiesto x402 (descubrimiento)" data-en="x402 manifest (discovery)">Manifiesto x402 (descubrimiento)</b><p><a href="https://api.idphantom.com/.well-known/x402" target="_blank" rel="noopener">/.well-known/x402</a> — <span data-es="formato estándar para agentes x402." data-en="standard format for x402 agents.">formato estándar para agentes x402.</span></p></div>
+    <div class="card"><b>OpenAPI</b><p><a href="https://api.idphantom.com/openapi.json" target="_blank" rel="noopener">/openapi.json</a> — <span data-es="esquema completo del endpoint /verify." data-en="full /verify endpoint schema.">esquema completo del endpoint /verify.</span></p></div>
     <div class="card"><b>MCP / Smithery</b><p><a href="https://smithery.ai/servers/arbromagency/idphantom-mcp-server" target="_blank" rel="noopener">idphantom-mcp-server</a> — <span data-es="para Claude, Codex, Cursor y agentes MCP." data-en="for Claude, Codex, Cursor and MCP agents.">para Claude, Codex, Cursor y agentes MCP.</span></p></div>
     <div class="card"><b data-es="Red y moneda" data-en="Network and currency">Red y moneda</b><p data-es="Base mainnet (eip155:8453), USDC nativo 0x833589…A02913. Tu agente solo necesita saldo USDC: el gas del settlement lo paga el facilitator." data-en="Base mainnet (eip155:8453), native USDC 0x833589…A02913. Your agent only needs a USDC balance: the facilitator pays settlement gas.">Base mainnet (eip155:8453), USDC nativo 0x833589…A02913. Tu agente solo necesita saldo USDC: el gas del settlement lo paga el facilitator.</p></div>
   </div>

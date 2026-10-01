@@ -10,7 +10,7 @@ Regla clave: **el agente pagador solo necesita USDC** — el facilitator (Coinba
 
 ## Caso 1 — Pagar una API que cobra con IDPHANTOM (ej. verificación de receipts)
 
-Endpoint de ejemplo: `POST https://phantom-receipt-verify.onrender.com/verify` — cobra **$0.01 USDC** por llamada.
+Endpoint de ejemplo: `POST https://api.idphantom.com/verify` — cobra **$0.01 USDC** por llamada.
 
 1. **Descubre el reto.** Llama sin pagar; el servicio responde `402` con `accepts[0]`: `scheme`, `network`, `amount`, `asset`, `payTo`, `extra:{name,version}`.
    - Seguridad: verifica `asset == 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`, `network == "eip155:8453"` y `payTo` contra la dirección oficial publicada por el servicio. Si difiere, **detente y reporta** (posible sustitución de destinatario).
